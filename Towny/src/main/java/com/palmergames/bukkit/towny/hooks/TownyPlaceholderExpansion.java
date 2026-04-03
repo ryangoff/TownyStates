@@ -22,6 +22,7 @@ import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
+import com.palmergames.bukkit.towny.utils.TownStateUtil;
 import com.palmergames.util.StringMgmt;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -253,27 +254,27 @@ public class TownyPlaceholderExpansion extends PlaceholderExpansion implements R
             return balance;
 		case "town_tag": // %townyadvanced_town_tag%
 			if (resident.hasTown())
-				tag = String.format(TownySettings.getPAPIFormattingTown(), resident.getTownOrNull().getTag());
+				tag = String.format(TownySettings.getPAPIFormattingTown(), TownStateUtil.getTownTagWithState(resident.getTownOrNull()));
 			return tag;
 		case "town_tag_override": // %townyadvanced_town_tag_override%
-			if (resident.hasTown()) {
-				if (resident.getTownOrNull().hasTag())
-					tag = String.format(TownySettings.getPAPIFormattingTown(), resident.getTownOrNull().getTag());
-				else
-					tag = StringMgmt.remUnderscore(String.format(TownySettings.getPAPIFormattingTown(), resident.getTownOrNull().getName()));
-			}
+			if (resident.hasTown())
+				tag = String.format(TownySettings.getPAPIFormattingTown(), TownStateUtil.getTownTagOverrideWithState(resident.getTownOrNull()));
 			return tag;
 		case "town_tag_unformatted": // %townyadvanced_town_tag_unformatted%
 			if (resident.hasTown())
-				tag = resident.getTownOrNull().getTag();
+				tag = TownStateUtil.getTownTagWithState(resident.getTownOrNull());
 			return tag;
 		case "town_tag_override_unformatted": // %townyadvanced_town_tag_override_unformatted%
-			if (resident.hasTown()) {
-				if (resident.getTownOrNull().hasTag())
-					tag = resident.getTownOrNull().getTag();
-				else
-					tag = StringMgmt.remUnderscore(resident.getTownOrNull().getName());
-			}
+			if (resident.hasTown())
+				tag = TownStateUtil.getTownTagOverrideWithState(resident.getTownOrNull());
+			return tag;
+		case "state": // %townyadvanced_state%
+			if (resident.hasTown() && TownStateUtil.canUseState(resident.getTownOrNull()))
+				tag = TownStateUtil.getState(resident.getTownOrNull());
+			return tag;
+		case "state_code": // %townyadvanced_state_code%
+			if (resident.hasTown() && TownStateUtil.canUseState(resident.getTownOrNull()))
+				tag = TownStateUtil.getStateCode(resident.getTownOrNull());
 			return tag;
 		case "nation_tag": // %townyadvanced_nation_tag%
 			if (resident.hasNation())
@@ -303,8 +304,8 @@ public class TownyPlaceholderExpansion extends PlaceholderExpansion implements R
 			return tag;
 		case "towny_tag": // %townyadvanced_towny_tag%
 			if (resident.hasTown()) {
-				if (resident.getTownOrNull().hasTag())
-					town = resident.getTownOrNull().getTag();
+				if (resident.getTownOrNull().hasTag() || (TownStateUtil.canUseState(resident.getTownOrNull()) && TownStateUtil.hasState(resident.getTownOrNull())))
+					town = TownStateUtil.getTownTagWithState(resident.getTownOrNull());
 				if (resident.hasNation() && resident.getNationOrNull().hasTag())
 					nation = resident.getNationOrNull().getTag();
 			}
@@ -324,10 +325,21 @@ public class TownyPlaceholderExpansion extends PlaceholderExpansion implements R
 			else if (!town.isEmpty())
 				tag = String.format(TownySettings.getPAPIFormattingTown(), town);
 			return tag;
+		case "towny_short_formatted": // %townyadvanced_towny_short_formatted%
+			if (resident.hasTown()) {
+				town = TownStateUtil.getTownNameWithStateCode(resident.getTownOrNull());
+				if (resident.hasNation())
+					nation = resident.getNationOrNull().getFormattedName();
+			}
+			if (!nation.isEmpty())
+				tag = TownySettings.getPAPIFormattingBoth().replace("%t", town).replace("%n", nation);
+			else if (!town.isEmpty())
+				tag = String.format(TownySettings.getPAPIFormattingTown(), town);
+			return tag;
 		case "towny_tag_formatted": // %townyadvanced_towny_tag_formatted%
 			if (resident.hasTown()) {
-				if (resident.getTownOrNull().hasTag())
-					town = resident.getTownOrNull().getTag();
+				if (resident.getTownOrNull().hasTag() || (TownStateUtil.canUseState(resident.getTownOrNull()) && TownStateUtil.hasState(resident.getTownOrNull())))
+					town = TownStateUtil.getTownTagWithState(resident.getTownOrNull());
 				else
 					town = resident.getTownOrNull().getFormattedName();
 				if (resident.hasNation()) {
@@ -344,10 +356,7 @@ public class TownyPlaceholderExpansion extends PlaceholderExpansion implements R
 			return tag;
 		case "towny_tag_override": // %townyadvanced_towny_tag_override%
 			if (resident.hasTown()) {
-				if (resident.getTownOrNull().hasTag())
-					town = resident.getTownOrNull().getTag();
-				else
-					town = StringMgmt.remUnderscore(resident.getTownOrNull().getName());
+				town = TownStateUtil.getTownTagOverrideWithState(resident.getTownOrNull());
 				if (resident.hasNation()) {
 					if (resident.getNationOrNull().hasTag())
 						nation = resident.getNationOrNull().getTag();
@@ -362,10 +371,7 @@ public class TownyPlaceholderExpansion extends PlaceholderExpansion implements R
 			return tag;
 		case "towny_tag_override_with_minimessage_colour": // %townyadvanced_towny_tag_override_with_minimessage_colour%
 			if (resident.hasTown()) {
-				if (resident.getTownOrNull().hasTag())
-					town = resident.getTownOrNull().getTag();
-				else
-					town = StringMgmt.remUnderscore(resident.getTownOrNull().getName());
+				town = TownStateUtil.getTownTagOverrideWithState(resident.getTownOrNull());
 				String townHexColour = resident.getTownOrNull().getMapColorHexCode();
 				if (townHexColour != null)
 					town = "<#"+townHexColour+">" + town;

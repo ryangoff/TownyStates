@@ -104,6 +104,7 @@ import com.palmergames.bukkit.towny.utils.OutpostUtil;
 import com.palmergames.bukkit.towny.utils.ProximityUtil;
 import com.palmergames.bukkit.towny.utils.ResidentUtil;
 import com.palmergames.bukkit.towny.utils.SpawnUtil;
+import com.palmergames.bukkit.towny.utils.TownStateUtil;
 import com.palmergames.bukkit.towny.utils.TownRuinUtil;
 import com.palmergames.bukkit.towny.utils.TownUtil;
 import com.palmergames.bukkit.towny.utils.TownyComponents;
@@ -227,6 +228,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		"plotprice",
 		"shopprice",
 		"shoptax",
+		"state",
 		"embassyprice",
 		"embassytax",
 		"title",
@@ -1972,6 +1974,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		case "spawncost" -> townSetSpawnCost(sender, subArgs, admin, town);
 		case "name" -> townSetName(sender, subArgs, town);
 		case "tag" -> townSetTag(sender, subArgs, admin, town);
+		case "state" -> townSetState(sender, subArgs, town);
 		case "homeblock" -> townSetHomeblock(sender, town);
 		case "spawn" -> townSetSpawn(sender, town, admin);
 		case "outpost" -> townSetOutpost(sender, town);
@@ -2290,6 +2293,33 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 			if (admin) TownyMessaging.sendMsg(sender, Translatable.of("msg_set_town_tag", sender.getName(), town.getTag()));
 			TownyMessaging.sendPrefixedTownMessage(town, Translatable.of("msg_set_town_tag", sender.getName(), town.getTag()));
 		}
+	}
+
+	public static void townSetState(CommandSender sender, String[] split, Town town) throws TownyException {
+		checkPermOrThrow(sender, PermissionNodes.TOWNY_COMMAND_TOWN_SET_STATE.getNode());
+		if (split.length == 0)
+			throw new TownyException("Eg: /town set state Texas");
+
+		if (split[0].equalsIgnoreCase("clear")) {
+			TownStateUtil.clearState(town);
+			TownyMessaging.sendPrefixedTownMessage(town, "The town state tag has been cleared.");
+			Resident senderResident = sender instanceof Player player ? TownyUniverse.getInstance().getResident(player.getUniqueId()) : null;
+			if (senderResident == null || !town.hasResident(senderResident))
+				TownyMessaging.sendMsg(sender, "The town state tag has been cleared.");
+			return;
+		}
+		if (!TownStateUtil.canUseState(town))
+			throw new TownyException("States can only be set for towns in the United States nation.");
+
+		String requestedState = NameValidation.checkAndFilterTitlesSurnameOrThrow(split);
+		String state = TownStateUtil.resolveStateName(requestedState);
+		if (state.isEmpty())
+			throw new TownyException("Invalid state. Use one of the 50 U.S. states, Puerto Rico, or Washington, DC.");
+		TownStateUtil.setState(town, state);
+		TownyMessaging.sendPrefixedTownMessage(town, "The town state tag has been set to " + state + ".");
+		Resident senderResident = sender instanceof Player player ? TownyUniverse.getInstance().getResident(player.getUniqueId()) : null;
+		if (senderResident == null || !town.hasResident(senderResident))
+			TownyMessaging.sendMsg(sender, "The town state tag has been set to " + state + ".");
 	}
 
 	public static void townSetHomeblock(CommandSender sender, final Town town) throws TownyException {

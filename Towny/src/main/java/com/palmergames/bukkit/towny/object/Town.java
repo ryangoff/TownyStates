@@ -37,6 +37,7 @@ import com.palmergames.bukkit.towny.permissions.TownyPerms;
 import com.palmergames.bukkit.towny.utils.CombatUtil;
 import com.palmergames.bukkit.towny.utils.MoneyUtil;
 import com.palmergames.bukkit.towny.utils.ProximityUtil;
+import com.palmergames.bukkit.towny.utils.TownStateUtil;
 import com.palmergames.bukkit.towny.utils.TownUtil;
 import com.palmergames.bukkit.towny.utils.TownyComponents;
 import com.palmergames.bukkit.util.BukkitTools;
@@ -1576,7 +1577,7 @@ public class Town extends Government implements TownBlockOwner {
 		TownyObjectFormattedNameEvent event = new TownyObjectFormattedNameEvent(this, prefix, postfix);
 		BukkitTools.fireEvent(event);
 
-		return event.getPrefix() + getName().replace("_", " ") + event.getPostfix();
+		return event.getPrefix() + TownStateUtil.getTownNameWithState(this) + event.getPostfix();
 	}
 	
 	public String getPrefix() {
