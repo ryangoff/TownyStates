@@ -276,6 +276,13 @@ public class TownyPlaceholderExpansion extends PlaceholderExpansion implements R
 			if (resident.hasTown() && TownStateUtil.canUseState(resident.getTownOrNull()))
 				tag = TownStateUtil.getStateCode(resident.getTownOrNull());
 			return tag;
+		case "state_code_formatted": // %townyadvanced_state_code_formatted%
+			if (resident.hasTown() && TownStateUtil.canUseState(resident.getTownOrNull())) {
+				String stateCode = TownStateUtil.getStateCode(resident.getTownOrNull());
+				if (!stateCode.isEmpty())
+					tag = ChatColor.WHITE + "[" + ChatColor.GREEN + stateCode + ChatColor.WHITE + "] " + ChatColor.RESET;
+			}
+			return tag;
 		case "nation_tag": // %townyadvanced_nation_tag%
 			if (resident.hasNation())
 				tag = String.format(TownySettings.getPAPIFormattingNation(), resident.getNationOrNull().getTag());
