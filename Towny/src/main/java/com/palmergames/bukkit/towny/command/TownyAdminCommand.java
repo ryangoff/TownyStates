@@ -1200,9 +1200,6 @@ public class TownyAdminCommand extends BaseCommand implements CommandExecutor {
 			TownyMessaging.sendTownMessagePrefixed(town, Translatable.of("msg_you_have_been_given_bonus_blocks", extraBlocks)); 
 		if (isConsole && !isTown) {
 			TownyMessaging.sendMsg(target, Translatable.of("msg_you_have_been_given_bonus_blocks", extraBlocks)); 
-			TownyMessaging.sendMessage(target, Translatable.of("msg_ptw_warning_1").forLocale(target));
-			TownyMessaging.sendMessage(target, Translatable.of("msg_ptw_warning_2").forLocale(target));
-			TownyMessaging.sendMessage(target, Translatable.of("msg_ptw_warning_3").forLocale(target));
 		}
 		town.save();
 

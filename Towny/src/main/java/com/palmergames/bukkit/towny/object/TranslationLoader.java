@@ -316,23 +316,6 @@ public class TranslationLoader {
 	 * @return string language value of a locale's language key.
 	 */
 	private static String getTranslationValue(Map.Entry<String, Object> entry) {
-		// Messages blocked from being overridden.
-		if (entry.getKey().toLowerCase(Locale.ROOT).startsWith("msg_ptw_warning")) {
-			// Get the defaultLocale's translation of the PTW warnings.
-			String msg = String.valueOf(entry.getValue());
-			Towny.getPlugin().getLogger().warning("Attempted to override an protected string. Skipped " + entry.getKey());
-			// It's extremely possible the jar was edited and the string is missing/was modified.
-			if (!msg.contains("Towny"))
-				// Return a hard-coded message, the translation in the jar was likely tampered with.
-				return switch (entry.getKey()) {
-					case "msg_ptw_warning_1" -> "If you have paid any real-life money for these townblocks please understand: the server you play on is in violation of the Minecraft EULA and the Towny license.";
-					case "msg_ptw_warning_2" -> "The Towny team never intended for townblocks to be purchaseable with real money.";
-					case "msg_ptw_warning_3" -> "If you did pay real money you should consider playing on a Towny server that respects the wishes of the Towny Team.";
-					default -> throw new IllegalArgumentException("Unexpected value: " + entry.getKey());
-				};
-			// Return the defaultLocale's message, it appears to have been left alone.
-			return msg;
-		}
 		// Return the normal translation of the entry.
 		return String.valueOf(entry.getValue());
 	}
